@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "public"."Solves" ADD COLUMN     "dateTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

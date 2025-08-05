@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "public"."Solves" ALTER COLUMN "time" SET DATA TYPE DOUBLE PRECISION;
