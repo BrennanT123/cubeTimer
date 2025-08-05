@@ -5,7 +5,7 @@ import cors from "cors";
 import helmet from "helmet";
 
 const app = express();
-
+dotenv.config();
 //for railway
 app.set("trust proxy", 1);
 

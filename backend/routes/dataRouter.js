@@ -8,6 +8,8 @@ dataRouter.get("/getTime/:timeId",dataCtrl.getTime);
 dataRouter.delete("/deleteTime/:timeId",dataCtrl.deleteTime);
 dataRouter.put("/putPlusTwo/:timeId",dataCtrl.putPlusTwo);
 dataRouter.put("/putDnf/:timeId",dataCtrl.putDNF);
-dataRouter.get("/getHistory/",dataCtrl.getHistory);
+dataRouter.get("/getHistory",dataCtrl.getHistory);
+dataRouter.get("/getNumSolves",dataCtrl.getNumSolves);
+
 
 export default dataRouter;
