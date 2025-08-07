@@ -101,12 +101,17 @@ export const deleteTime = async (req, res) => {
 //gets the most recent solves. Num of solves is determined by req.body.numSolves
 export const getHistory = async (req, res) => {
   try {
-    const recentSolves = await prisma.solves.findMany({
+    const { numSolves } = req.query;
+    const queryOptions = {
       orderBy: {
         dateTime: "desc",
       },
-      take: parseInt(req.query.numSolves),
-    });
+    };
+    if (numSolves && numSolves !== "all") {
+      queryOptions.take = parseInt(numSolves);
+    }
+
+    const recentSolves = await prisma.solves.findMany(queryOptions);
 
     return res
       .status(200)
@@ -130,9 +135,12 @@ export const getNumSolves = async (req, res) => {
         plusTwo: true,
       },
     });
-    return res
-      .status(200)
-      .json({ msg: "Count retrieved successfully", solveCount, dnfCount, p2Count });
+    return res.status(200).json({
+      msg: "Count retrieved successfully",
+      solveCount,
+      dnfCount,
+      p2Count,
+    });
   } catch (error) {
     console.error("Error getting history");
   }
