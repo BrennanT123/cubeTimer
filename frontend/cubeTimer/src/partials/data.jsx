@@ -1,15 +1,13 @@
-import { useState } from "react";
 import dataStyles from "../styles/dataStyles.module.css";
 import axios from "axios";
 import { API_LINK } from "../utl/constants";
-import { useEffect } from "react";
-import { data } from "react-router-dom";
-
+import { useEffect, useState, useRef } from "react";
+import { SolveChart } from "./chart";
+import { Totals } from "./totals";
 function Data() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recentSolves, setRecentSolves] = useState();
-  const [numSolves, setNumSolves] = useState();
 
   async function getSolvesForTable() {
     try {
@@ -23,12 +21,6 @@ function Data() {
         }
       );
 
-      const numberSolves = await axios.get(
-        `${API_LINK}/dataRouter/getNumSolves`
-      );
-
-      setNumSolves(numberSolves.data);
-      console.log(numberSolves);
       setRecentSolves(recentSolvesRes.data.recentSolves);
 
       setLoading(false);
@@ -42,13 +34,9 @@ function Data() {
       await axios.put(`${API_LINK}/dataRouter/putPlusTwo/${solveId}`);
 
       setRecentSolves((prevSolves) =>
-        prevSolves.map((solve) => {
-          {
-            solve.id === solveId
-              ? { ...solve, plusTwo: !solve.plusTwo }
-              : solve;
-          }
-        })
+        prevSolves.map((solve) =>
+          solve.id === solveId ? { ...solve, plusTwo: !solve.plusTwo } : solve
+        )
       );
     } catch (error) {
       setError(error);
@@ -85,22 +73,13 @@ function Data() {
 
   return (
     <>
+      <SolveChart></SolveChart>
       {error && <div className={dataStyles.errorText}>An error occurred</div>}
       {loading && <div className={dataStyles.loadingText}>Loading...</div>}
 
-      {!loading && recentSolves && (
+      {!loading && !error && recentSolves && (
         <>
-          <div className={dataStyles.solveCountTable}>
-            <div>
-              Number of Solves:<div> {numSolves.solveCount}</div>
-            </div>
-            <div>
-              Number of DNFs: <div>{numSolves.dnfCount}</div>
-            </div>
-            <div>
-              Number of +2s: <div>{numSolves.p2Count}</div>
-            </div>
-          </div>
+          <Totals></Totals>
           <div className={dataStyles.previousSolves}>
             <div className={dataStyles.headerRow}>
               <div>Time (s)</div>
