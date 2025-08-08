@@ -86,6 +86,7 @@ function Data() {
               <div>DNF</div>
               <div>+2</div>
               <div>Delete</div>
+              <div>Scramble</div>
             </div>
 
             {recentSolves.map((solve) => (
@@ -109,6 +110,7 @@ function Data() {
                 >
                   X
                 </div>
+                <div className={dataStyles.scramble}>{solve.scramble}</div>
               </div>
             ))}
           </div>

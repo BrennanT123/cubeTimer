@@ -13,7 +13,7 @@
 
 .headerRow {
   display: grid;
-  grid-template-columns: 1fr 80px 80px 80px;
+  grid-template-columns: 1fr 80px 80px 80px 16rem;
   font-weight: bold;
   background-color: #eaeaea;
   padding: 10px;
@@ -23,7 +23,7 @@
 
 .solveRow {
   display: grid;
-  grid-template-columns: 1fr 80px 80px 80px;
+  grid-template-columns: 1fr 80px 80px 80px 16rem;;
   background-color: white;
   padding: 10px;
   border-radius: 6px;
