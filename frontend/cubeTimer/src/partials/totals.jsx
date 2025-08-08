@@ -4,7 +4,7 @@ import { API_LINK } from "../utl/constants";
 import { useEffect, useState, useRef } from "react";
 import { SolveChart } from "./chart";
 
-export function Totals({ solves })  {
+export function Totals({ solves }) {
   const [numSolves, setNumSolves] = useState();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -13,7 +13,10 @@ export function Totals({ solves })  {
     try {
       setLoading(true);
       const numberSolves = await axios.get(
-        `${API_LINK}/dataRouter/getNumSolves`
+        `${API_LINK}/dataRouter/getNumSolves`,
+        {
+          withCredentials: true,
+        }
       );
 
       setNumSolves(numberSolves.data);
@@ -28,8 +31,8 @@ export function Totals({ solves })  {
     getTotalSolves();
   }, []);
 
-  function handleResetTotals(){
-     getTotalSolves();
+  function handleResetTotals() {
+    getTotalSolves();
   }
 
   return (
@@ -49,7 +52,12 @@ export function Totals({ solves })  {
               Number of +2s: <div>{numSolves.p2Count}</div>
             </div>
           </div>
-          <button onClick= {handleResetTotals} className={dataStyles.resetTotalButton}>Reset Totals</button>
+          <button
+            onClick={handleResetTotals}
+            className={dataStyles.resetTotalButton}
+          >
+            Reset Totals
+          </button>
         </>
       )}
     </>

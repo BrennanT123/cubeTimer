@@ -22,8 +22,12 @@ export function useLineChart({
       solveData.time,
     ]);
     //setup the canvas
-    canvas.width = 400;
-    canvas.height = 400;
+   
+    canvas.width = 600; // drawing resolution
+    canvas.height = 600;
+    canvas.style.width = "600px"; // visual display size
+    canvas.style.height = "600px";
+
     init();
 
     function init() {
@@ -53,6 +57,7 @@ export function useLineChart({
         ],
       };
       const options = {
+        animation: false,
         parsing: false,
         plugins: {
           legend: {

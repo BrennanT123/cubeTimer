@@ -85,10 +85,16 @@ function Timer() {
         if (isRunning) {
           console.log(`Time ${timeForBackend} scramble ${currentScramble}`);
           try {
-            await axios.post(`${API_LINK}/dataRouter/postNewTime`, {
-              time: timeForBackend,
-              scramble: currentScramble,
-            });
+            await axios.post(
+              `${API_LINK}/dataRouter/postNewTime`,
+              {
+                time: timeForBackend,
+                scramble: currentScramble,
+              },
+              {
+                withCredentials: true,
+              }
+            );
             setNewSolve(timeForBackend);
           } catch (error) {
             setError(error);

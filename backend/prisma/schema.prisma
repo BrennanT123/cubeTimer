@@ -15,10 +15,20 @@ datasource db {
 }
 
 model Solves {
-  id       String   @id @default(cuid())
-  time     Float
-  dateTime DateTime @default(now())
-  dnf      Boolean  @default(false)
-  plusTwo  Boolean  @default(false)
-  scramble String 
+  id        String   @id @default(cuid())
+  time      Float
+  dateTime  DateTime @default(now())
+  dnf       Boolean  @default(false)
+  plusTwo   Boolean  @default(false)
+  scramble  String
+  sessionId String?
+  session   Session? @relation(fields: [sessionId], references: [id])
+}
+
+model Session {
+  id     String   @id
+  sid    String   @unique
+  data   String
+  expiresAt DateTime
+  solves Solves[]
 }

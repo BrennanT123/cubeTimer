@@ -10,6 +10,6 @@ dataRouter.put("/putPlusTwo/:timeId",dataCtrl.putPlusTwo);
 dataRouter.put("/putDnf/:timeId",dataCtrl.putDNF);
 dataRouter.get("/getHistory",dataCtrl.getHistory);
 dataRouter.get("/getNumSolves",dataCtrl.getNumSolves);
-
+dataRouter.get("/checkSession",dataCtrl.checkSessionExists);
 
 export default dataRouter;

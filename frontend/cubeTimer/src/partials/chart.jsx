@@ -24,6 +24,9 @@ export function SolveChart() {
           params: {
             numSolves: chartNumSolves,
           },
+        },
+        {
+          withCredentials: true, 
         }
       );
       setAllSolves(allSolvesRes.data.recentSolves);
