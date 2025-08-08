@@ -20,4 +20,5 @@ model Solves {
   dateTime DateTime @default(now())
   dnf      Boolean  @default(false)
   plusTwo  Boolean  @default(false)
+  scramble String 
 }
