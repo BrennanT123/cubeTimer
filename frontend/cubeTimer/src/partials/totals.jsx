@@ -4,7 +4,7 @@ import { API_LINK } from "../utl/constants";
 import { useEffect, useState, useRef } from "react";
 import { SolveChart } from "./chart";
 
-export function Totals() {
+export function Totals({ solves })  {
   const [numSolves, setNumSolves] = useState();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);

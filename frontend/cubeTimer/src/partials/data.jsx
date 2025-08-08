@@ -4,7 +4,9 @@ import { API_LINK } from "../utl/constants";
 import { useEffect, useState, useRef } from "react";
 import { SolveChart } from "./chart";
 import { Totals } from "./totals";
+import { useOutletContext } from "react-router-dom";
 function Data() {
+  const { newSolve, setNewSolve } = useOutletContext();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recentSolves, setRecentSolves] = useState();
@@ -69,29 +71,31 @@ function Data() {
 
   useEffect(() => {
     getSolvesForTable();
-  }, []);
+  }, [newSolve]);
 
   return (
-    <>
+    <div className={dataStyles.dataContainer}>
       <SolveChart></SolveChart>
       {error && <div className={dataStyles.errorText}>An error occurred</div>}
       {loading && <div className={dataStyles.loadingText}>Loading...</div>}
 
       {!loading && !error && recentSolves && (
         <>
-          <Totals></Totals>
+          <Totals solves={recentSolves}></Totals>
           <div className={dataStyles.previousSolves}>
+            <div>Last 10 solves</div>
             <div className={dataStyles.headerRow}>
               <div>Time (s)</div>
+              <div>Scramble</div>
               <div>DNF</div>
               <div>+2</div>
               <div>Delete</div>
-              <div>Scramble</div>
             </div>
 
             {recentSolves.map((solve) => (
               <div key={solve.id} className={dataStyles.solveRow}>
                 <div>{solve.time.toFixed(2)}</div>
+                <div className={dataStyles.scramble}>{solve.scramble}</div>
                 <div
                   className={`${dataStyles.clickableCell} ${
                     solve.dnf ? dataStyles.trueValue : ""
@@ -110,13 +114,12 @@ function Data() {
                 >
                   X
                 </div>
-                <div className={dataStyles.scramble}>{solve.scramble}</div>
               </div>
             ))}
           </div>
         </>
       )}
-    </>
+    </div>
   );
 }
 

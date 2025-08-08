@@ -4,8 +4,10 @@ import { API_LINK } from "../utl/constants";
 import { useEffect, useState, useRef } from "react";
 
 import Canvas from "./canvas";
+import { useOutletContext } from "react-router-dom";
 
 export function SolveChart() {
+  const { newSolve, setNewSolve } = useOutletContext();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [allSolves, setAllSolves] = useState();
@@ -31,13 +33,13 @@ export function SolveChart() {
     }
   }
   function handleChartNumChange() {
+    getSolvesForChart();
     setChartNumSolves(solveNumRef.current.value);
   }
 
-
   useEffect(() => {
     getSolvesForChart();
-  }, [chartNumSolves]);
+  }, [chartNumSolves, newSolve]);
 
   return (
     <div className={dataStyles.chartContainer}>
@@ -45,7 +47,7 @@ export function SolveChart() {
         <>
           <Canvas containerRef={containerRef} solves={allSolves}></Canvas>
           <input
-          ref = {solveNumRef}
+            ref={solveNumRef}
             type="number"
             name="numberOfSolves"
             id="numberOfSolves"

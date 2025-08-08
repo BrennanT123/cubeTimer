@@ -5,6 +5,16 @@ import "./index.css";
 import App from "./App.jsx";
 import Home from "./pages/home.jsx";
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [{ index: true, element: <Home /> }],
+  },
+]);
+
 createRoot(document.getElementById("root")).render(
-<App></App>
+  <StrictMode>
+    <RouterProvider router={router} />
+  </StrictMode>
 );

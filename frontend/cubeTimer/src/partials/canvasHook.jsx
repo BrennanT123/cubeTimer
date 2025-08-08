@@ -21,7 +21,6 @@ export function useLineChart({
       solveTimeLength - i,
       solveData.time,
     ]);
-    console.log(solveTimes);
     //setup the canvas
     canvas.width = 400;
     canvas.height = 400;
@@ -53,16 +52,49 @@ export function useLineChart({
           },
         ],
       };
-
       const options = {
         parsing: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: "white",
+              font: {
+                size: 14,
+                weight: "bold",
+              },
+            },
+          },
+          title: {
+            display: true,
+            text: "Solve times",
+            color: "white",
+            font: {
+              size: 18,
+            },
+          },
+        },
         scales: {
           x: {
             ticks: {
-              display: false,
+              color: "white",
+            },
+            title: {
+              display: true,
+              text: "Solve Number",
+              color: "white",
             },
             grid: {
               display: false,
+            },
+          },
+          y: {
+            ticks: {
+              color: "white",
+            },
+            title: {
+              display: true,
+              text: "Time (s)",
+              color: "white",
             },
           },
         },
