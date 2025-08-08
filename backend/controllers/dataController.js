@@ -4,9 +4,11 @@ const prisma = new PrismaClient();
 export const postNewTime = async (req, res) => {
   try {
     const time = parseFloat(req.body.time);
+    const scramble = req.body.scramble;
     const newTime = await prisma.solves.create({
       data: {
         time,
+        scramble,
       },
     });
     return res.status(201).json({ msg: "Time added successfully", newTime });

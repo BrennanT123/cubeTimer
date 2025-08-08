@@ -11,6 +11,7 @@ describe("CRUD new time", () => {
       .post("/dataRouter/postNewTime")
       .send({
         time: (Math.random() * 5 + 15).toFixed(2),
+        scramble: `B L L' F' L U' U R' D' U' L L' R' U F R'`
       });
     if (res.statusCode !== 201) {
       console.error(res.error);
