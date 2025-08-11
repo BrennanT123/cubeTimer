@@ -62,7 +62,7 @@ export function useLineChart({
         plugins: {
           legend: {
             labels: {
-              color: "white",
+              color: "black",
               font: {
                 size: 14,
                 weight: "bold",
@@ -72,7 +72,7 @@ export function useLineChart({
           title: {
             display: true,
             text: "Solve times",
-            color: "white",
+            color: "black",
             font: {
               size: 18,
             },
@@ -81,7 +81,7 @@ export function useLineChart({
         scales: {
           x: {
             ticks: {
-              color: "white",
+              color: "black",
             },
             title: {
               display: true,
@@ -94,7 +94,7 @@ export function useLineChart({
           },
           y: {
             ticks: {
-              color: "white",
+              color: "black",
             },
             title: {
               display: true,
