@@ -124,6 +124,7 @@ function Timer() {
 
   return (
     <div className={timerStyles.timerContainer}>
+      <h1>Press space to start/stop timer</h1>
       <div className={timerStyles.scrambleContainer}>{currentScramble}</div>
       <div
         className={`${timerStyles.timer} ${

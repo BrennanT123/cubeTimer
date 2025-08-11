@@ -22,7 +22,7 @@ export function useLineChart({
       solveData.time,
     ]);
     //setup the canvas
-   
+
     canvas.width = 600; // drawing resolution
     canvas.height = 600;
     canvas.style.width = "600px"; // visual display size
