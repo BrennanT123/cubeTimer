@@ -34,7 +34,7 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
       httpOnly: true,
       sameSite: isLocal ? "lax" : "none",
@@ -71,3 +71,4 @@ if (process.env.NODE_ENV !== "test") {
 }
 
 export default app;
+

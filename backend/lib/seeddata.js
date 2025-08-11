@@ -1,33 +1,33 @@
-import { PrismaClient } from "../generated/prisma/index.js";
-import dotenv from "dotenv";
+// import { PrismaClient } from "../generated/prisma/index.js";
+// import dotenv from "dotenv";
 
-dotenv.config();
+// dotenv.config();
 
-const databaseUrl = process.env.DATABASE_URL;
+// const databaseUrl = process.env.DATABASE_URL;
 
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: databaseUrl,
-    },
-  },
-});
+// const prisma = new PrismaClient({
+//   datasources: {
+//     db: {
+//       url: databaseUrl,
+//     },
+//   },
+// });
 
 //deletes all the solves
 // await prisma.solves.deleteMany({});
 
-async function createSolve(time, plusTwo, dnf, dateTime, scramble, sessionId) {
-  return await prisma.solves.create({
-    data: {
-      time: parseFloat(time),
-      plusTwo,
-      dnf,
-      dateTime,
-      scramble,
-      sessionId,
-    },
-  });
-}
+// async function createSolve(time, plusTwo, dnf, dateTime, scramble, sessionId) {
+//   return await prisma.solves.create({
+//     data: {
+//       time: parseFloat(time),
+//       plusTwo,
+//       dnf,
+//       dateTime,
+//       scramble,
+//       sessionId,
+//     },
+//   });
+// }
 
 function createScramble() {
   let scramble = "";
@@ -66,30 +66,29 @@ function createScramble() {
   }
   return scramble;
 }
-
-function seedData(totalRecords, sessionId)
-{
-  // const totalRecords = 1000;
+export default async function seedData(tx, totalRecords, sessionId) {
   const now = new Date();
-  //calculate the start date: (100(total records) - 1) * 30s = 2970s = 49.5 min ago
   let baseTime = new Date(now.getTime() - (totalRecords - 1) * 30 * 1000);
 
+  const rows = [];
   for (let i = 0; i < totalRecords; i++) {
     const ideal = 15 + 75 * Math.exp(-i / (totalRecords / 5));
     const noise = (Math.random() - 0.5) * 10;
-    const time = Math.max(ideal + noise, 10).toFixed(2);
-    const scramble = createScramble();
-    createSolve(
-      time,
-      Math.random() > 0.9,
-      Math.random() > 0.95,
-      baseTime,
-      scramble,
-      sessionId
-    );
-    // console.log(time);
+    const time = Math.max(ideal + noise, 10);
+
+    rows.push({
+      time: parseFloat(time.toFixed(2)),
+      plusTwo: Math.random() > 0.9,
+      dnf: Math.random() > 0.95,
+      dateTime: baseTime,
+      scramble: createScramble(),
+      sessionId,
+    });
+
     baseTime = new Date(baseTime.getTime() + 30 * 1000);
   }
-}
 
-export default seedData;
+
+  const { count } = await tx.solves.createMany({ data: rows });
+  return count;
+}

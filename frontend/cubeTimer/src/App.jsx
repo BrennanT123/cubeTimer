@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Data from "./partials/data";
 import "./App.css";
 import Timer from "./partials/timer";
@@ -11,6 +11,7 @@ function App() {
   const [count, setCount] = useState(0);
   const [newSolve, setNewSolve] = useState();
   const [sessionReady, setSessionReady] = useState(false);
+  const didInit = useRef(false);
 
   async function checkSession() {
     try {
@@ -26,14 +27,16 @@ function App() {
     } catch (error) {
       console.log(`Error checking session`);
       console.log(error);
+      ``;
     } finally {
       setSessionReady(true);
     }
   }
   useEffect(() => {
-    checkSession(); 
+    if (didInit.current) return;
+    didInit.current = true;
+    checkSession();
   }, []);
-
 
   useEffect(() => {
     const preventScroll = (e) => {
@@ -52,7 +55,7 @@ function App() {
 
   return (
     <div className="appContainer">
-      <Outlet context={{ newSolve, setNewSolve }}></Outlet>
+      <Outlet context={{ newSolve, setNewSolve, sessionReady }}></Outlet>
     </div>
   );
 }

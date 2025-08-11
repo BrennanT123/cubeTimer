@@ -4,15 +4,23 @@ import axios from "axios";
 import { API_LINK } from "../utl/constants";
 import { SolveChart } from "./chart";
 import { Totals } from "./totals";
-import { useOutletContext } from "react-router-dom";
+import { data, useOutletContext } from "react-router-dom";
 import { useMemo, useState, useEffect } from "react";
 import { Container, Row, Col, Table, Pagination } from "react-bootstrap";
+import {
+  Description,
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+} from "@headlessui/react";
 
 function Data() {
-  const { newSolve } = useOutletContext();
+  const { newSolve, sessionReady } = useOutletContext();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recentSolves, setRecentSolves] = useState([]);
+
+  let [isOpen, setIsOpen] = useState(false);
 
   // pagination
   const [page, setPage] = useState(1);
@@ -39,6 +47,7 @@ function Data() {
       });
       setRecentSolves(res.data.recentSolves || []);
     } catch (err) {
+      console.log(err);
       setError(true);
     } finally {
       setLoading(false);
@@ -47,13 +56,15 @@ function Data() {
 
   async function handlePlusTwoClick(id) {
     try {
+      console.log(recentSolves);
       await axios.put(`${API_LINK}/dataRouter/putPlusTwo/${id}`, null, {
         withCredentials: true,
       });
       setRecentSolves((prev) =>
         prev.map((s) => (s.id === id ? { ...s, plusTwo: !s.plusTwo } : s))
       );
-    } catch {
+    } catch(err) {
+      console.log(err);
       setError(true);
     }
   }
@@ -66,7 +77,8 @@ function Data() {
       setRecentSolves((prev) =>
         prev.map((s) => (s.id === id ? { ...s, dnf: !s.dnf } : s))
       );
-    } catch {
+    } catch(err) {
+      console.error(err);
       setError(true);
     }
   }
@@ -82,10 +94,23 @@ function Data() {
     }
   }
 
+  async function handleDelAllSolves() {
+    try {
+      setLoading(true);
+      await axios.delete(`${API_LINK}/dataRouter/deleteSessionSolves`);
+      setIsOpen(false);
+      setRecentSolves([]);
+    } catch (error) {
+      setError(true);
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
   useEffect(() => {
     getSolvesForTable();
     setPage(1);
-  }, [newSolve]);
+  }, [newSolve, sessionReady]);
 
   const goTo = (p) => setPage(Math.min(Math.max(1, p), totalPages));
 
@@ -97,7 +122,7 @@ function Data() {
       {!loading && !error && recentSolves && (
         <Row className={dataStyles.gridWrap}>
           <Col lg={7} className={dataStyles.leftPane}>
-       <div className={dataStyles.headerBar}>
+            <div className={dataStyles.headerBar}>
               <strong className="text-white">Previous solves</strong>
             </div>
 
@@ -153,8 +178,8 @@ function Data() {
                 ))}
               </tbody>
             </Table>
-           
-          <div className={dataStyles.paginationRow}>
+
+            <div className={dataStyles.paginationRow}>
               <Pagination className="mb-0">
                 <Pagination.First
                   disabled={page === 1}
@@ -174,15 +199,14 @@ function Data() {
                   onClick={() => goTo(totalPages)}
                 />
               </Pagination>
-                 <small className={dataStyles.pageMeta}>
+              <small className={dataStyles.pageMeta}>
                 Page {page} of {totalPages}
               </small>
             </div>
           </Col>
 
-    
           <Col lg={5} className={dataStyles.rightPane}>
-            <div className={dataStyles.sticky}>
+            <div className={dataStyles.chartSide}>
               <div className={dataStyles.card}>
                 <Totals solves={recentSolves} />
               </div>
@@ -190,6 +214,51 @@ function Data() {
                 <SolveChart solves={recentSolves} />
               </div>
             </div>
+            <div
+              className={dataStyles.deleteAllSolves}
+              onClick={() => setIsOpen(true)}
+            >
+              Delete All Solves
+            </div>
+            <Dialog
+              open={isOpen}
+              onClose={() => setIsOpen(false)}
+              className={dataStyles.dialogRoot}
+            >
+              <div className={dataStyles.dialogOverlay} />
+              <div className={dataStyles.dialogContainer}>
+                <DialogPanel className={dataStyles.dialogPanel}>
+                  <DialogTitle className={dataStyles.dialogTitle}>
+                    Delete all solves?
+                  </DialogTitle>
+
+                  <Description className={dataStyles.dialogDescription}>
+                    This will permanently delete all of your solves.
+                  </Description>
+
+                  <p className={dataStyles.dialogBody}>
+                    Are you sure you want to delete all solves?
+                  </p>
+
+                  <div className={dataStyles.dialogActions}>
+                    <button
+                      type="button"
+                      className={dataStyles.btnSecondary}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className={dataStyles.btnDanger}
+                      onClick={() => handleDelAllSolves()}
+                    >
+                      Confirm
+                    </button>
+                  </div>
+                </DialogPanel>
+              </div>
+            </Dialog>
           </Col>
         </Row>
       )}

@@ -54,31 +54,45 @@ export const getTime = async (req, res) => {
 
 export const putPlusTwo = async (req, res) => {
   try {
-    console.log("HERE IS SESSION ID IN PLUS TWO", req.sessionID);
-    const timeId = req.params.timeId;
-    const sessionId = req.sessionID;
-    const editedTime = await prisma.solves.findFirst({
-      where: { id: timeId, sessionId: sessionId },
-    });
-    if (!editedTime) {
-      return res.status(404).json({ error: "Time not found", sessionId });
+    const sid = req.sessionID;
+    const id = String(req.params.timeId || "").trim();
+    // console.log("HERE IS SESSION ID IN PLUS TWO", req.sessionID);
+    // console.log("HERE IS TIME ID IN PLUS TWO", req.params.timeId);
+  
+    const sessionSolveCount = await prisma.solves.count({ where: { sessionId: sid } });
+
+    const byId = await prisma.solves.findUnique({ where: { id } });
+    if (!byId) {
+      return res.status(404).json({
+        error: "Solve not found by id",
+        id,
+        sid,
+        sessionSolveCount, 
+      });
     }
-    const solve = await prisma.solves.update({
-      where: {
-        id: timeId,
-      },
-      data: {
-        plusTwo: !editedTime.plusTwo,
-      },
+
+    if (byId.sessionId !== sid) {
+      return res.status(403).json({
+        error: "Solve belongs to different session",
+        id,
+        sid,
+        solveSessionId: byId.sessionId,
+        sessionSolveCount,
+      });
+    }
+
+    const updated = await prisma.solves.update({
+      where: { id },
+      data: { plusTwo: !byId.plusTwo },
     });
-    console.log(solve);
-    return res.status(200).json({ msg: "Time updated successfully", solve });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ msg: "Error updating time", error, sessionId });
+
+    return res.json({ msg: "ok", solve: updated, sessionSolveCount });
+  } catch (e) {
+    console.error("Error updating time (+2):", e);
+    return res.status(500).json({ msg: "Error updating time", error: e.message });
   }
 };
+
 
 export const putDNF = async (req, res) => {
   try {
@@ -127,40 +141,43 @@ export const deleteTime = async (req, res) => {
     return res.status(500).json({ error: "Error deleting time" });
   }
 };
-
 import seedData from "../lib/seeddata.js";
-
 export const checkSessionExists = async (req, res) => {
   try {
     const sessionId = req.sessionID;
-    const existingSession = await prisma.session.findUnique({
-      where: { id: sessionId },
-    });
 
-    if (!existingSession) {
-      console.log("New session — seeding default data");
-
-      //create the session so it doesnt get triggered twice
-      await prisma.session.create({
-        data: {
+    await prisma.$transaction(async (tx) => {
+      await tx.session.upsert({
+        where: { id: sessionId },
+        update: {},
+        create: {
           id: sessionId,
           sid: sessionId,
           data: "",
           expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 10),
         },
       });
-      req.session.initialized = true;
-      console.log(sessionId);
-      await seedData(1000, sessionId);
-    }
-    return res
-      .status(200)
-      .json({ sessionExists: existingSession ? true : false, seeded: true });
+
+      const already = await tx.solves.count({ where: { sessionId } });
+      if (already === 0) {
+        await seedData(tx, 1000, sessionId);
+      }
+    });
+
+    
+    req.session.initialized = true;
+    await new Promise((resolve, reject) =>
+      req.session.save(err => (err ? reject(err) : resolve()))
+    );
+
+    return res.status(200).json({ sessionExists: true, seeded: true });
   } catch (error) {
-    console.error("Error checking session");
-    return res.status(500).json({ error, msg: "Error checking session " });
+    console.error("Error checking session", error);
+    return res.status(500).json({ error: error.message, msg: "Error checking session" });
   }
 };
+
+
 //gets the most recent solves. Num of solves is determined by req.body.numSolves
 export const getHistory = async (req, res) => {
   try {
@@ -214,5 +231,24 @@ export const getNumSolves = async (req, res) => {
     });
   } catch (error) {
     console.error("Error getting history");
+    return res.status(500).json({ error, msg: "Error getting history " });
+  }
+};
+
+//for resetting all solves
+export const deleteAllSolves = async (req, res) => {
+  try {
+    const sessionId = req.sessionID;
+    await prisma.solves.deleteMany({
+      where: {
+        sessionId: sessionId,
+      },
+    });
+    return res.status(200).json({
+      msg: "solves deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting solves");
+    return res.status(500).json({ error, msg: "Error deleting solves" });
   }
 };
