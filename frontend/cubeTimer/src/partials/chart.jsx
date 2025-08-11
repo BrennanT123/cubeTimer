@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from "react";
 import Canvas from "./canvas";
 import { useOutletContext } from "react-router-dom";
 
-export function SolveChart() {
+export function SolveChart({ solves }) {
   const { newSolve, setNewSolve } = useOutletContext();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -18,18 +18,20 @@ export function SolveChart() {
   async function getSolvesForChart() {
     try {
       setLoading(true);
-      const allSolvesRes = await axios.get(
-        `${API_LINK}/dataRouter/getHistory`,
-        {
-          params: {
-            numSolves: chartNumSolves,
-          },
-        },
-        {
-          withCredentials: true, 
-        }
-      );
-      setAllSolves(allSolvesRes.data.recentSolves);
+
+      //   const allSolvesRes = await axios.get(
+      //     `${API_LINK}/dataRouter/getHistory`,
+      //     {
+      //       params: {
+      //         numSolves: chartNumSolves,
+      //       },
+      //     },
+      //     {
+      //       withCredentials: true,
+      //     }
+      //   );
+      //  console.log(allSolvesRes);
+      setAllSolves(solves.slice(0, chartNumSolves));
       setLoading(false);
     } catch (error) {
       setError(error);
@@ -42,7 +44,7 @@ export function SolveChart() {
 
   useEffect(() => {
     getSolvesForChart();
-  }, [chartNumSolves, newSolve]);
+  }, [chartNumSolves, newSolve, solves]);
 
   return (
     <div className={dataStyles.chartContainer}>
