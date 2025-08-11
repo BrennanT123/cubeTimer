@@ -22,7 +22,7 @@ function App() {
       // if (sessionExists.data.sessionExists === false) {
 
       // }
-      console.log(sessionExists);
+      // console.log(sessionExists);
     } catch (error) {
       console.log(`Error checking session`);
       console.log(error);

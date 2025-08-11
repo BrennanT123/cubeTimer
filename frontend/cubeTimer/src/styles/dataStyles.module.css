@@ -35,22 +35,30 @@
   background-color: #f0f8ff;
 }
 
-.clickableCell,
-.delSolve {
+.clickableCell {
   cursor: pointer;
+  display: inline-block;
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  transition: color 0.2s ease;
-  justify-self: center;
+  transition: background-color 0.2s ease;
+  /* justify-self: center; */
 }
-
+.delSolve:hover {
+  background-color: rgb(235, 184, 184);
+  cursor: pointer;
+}
 .clickableCell:hover {
   background-color: #b3a700;
 }
 
 .trueValue {
   background-color: rgb(201, 201, 255);
+}
+
+.clickableCell:hover,
+.clickableCell.trueValue:hover {
+  background-color: #b3a700;
 }
 
 .errorText {
@@ -110,11 +118,63 @@
 }
 
 .chartContainer {
+  /* width: 500px; */
+  /* height: auto; */
 }
 .dataContainer {
   background-color: rgb(49, 49, 49);
   padding: 16px;
   border-radius: 32px;
-
+  max-width: 1000px;
   box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+  height: fit-content;
+}
+
+.gridWrap {
+  row-gap: 16px;
+}
+.sticky {
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card,
+.tableCard {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+}
+.scramble {
+  white-space: normal;
+  word-break: break-word;
+}
+.headerBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  color: #fff;
+  font-weight: 600;
+}
+.paginationRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: center;
+}
+
+.pagination {
+  margin-bottom: 0;
+}
+
+.pageMeta {
+  color: #ffffff;
+  margin-left: 8px;
 }
