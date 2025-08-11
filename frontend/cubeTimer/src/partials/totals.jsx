@@ -5,12 +5,13 @@ import { useEffect, useState, useRef } from "react";
 import { SolveChart } from "./chart";
 // import { useLocation } from "react-router-dom";
 
-export function Totals({ solves }) {
+export function Totals({ solves, sanitizedSolves }) {
   const [numSolves, setNumSolves] = useState();
   const [numDnf, setNumDnf] = useState(0);
   const [numPlusTwo, setNumPlusTwo] = useState(0);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [Ao5, setA05] = useState();
   //   const location = useLocation();
   //   const solvesFromTable = location.state?.solves;
 
@@ -46,10 +47,37 @@ export function Totals({ solves }) {
         tempP2++;
       }
     });
+
     setNumPlusTwo(tempP2);
     setNumDnf(tempDnf);
 
-  }, [solves]);
+    if (!sanitizedSolves || sanitizedSolves.length < 5) {
+      setA05(undefined);
+      return;
+    }
+
+    const five = sanitizedSolves.slice(0, 5).map((s) => Number(s.time));
+
+    const max = Math.max(...five);
+    const min = Math.min(...five);
+
+    let removedMin = false,
+      removedMax = false;
+    const middle = five.filter((t) => {
+      if (!removedMin && t === min) {
+        removedMin = true;
+        return false;
+      }
+      if (!removedMax && t === max) {
+        removedMax = true;
+        return false;
+      }
+      return true;
+    });
+
+    const avg = middle.reduce((a, b) => a + b, 0) / middle.length;
+    setA05(avg.toFixed(2));
+  }, [solves, sanitizedSolves]);
 
   //   function handleResetTotals() {
   //     getTotalSolves();
@@ -71,6 +99,9 @@ export function Totals({ solves }) {
             <div>
               Number of +2s: <div>{numPlusTwo}</div>
             </div>
+          </div>
+          <div>
+            Ao5: <div>{Ao5}</div>
           </div>
           {/* <button
             onClick={handleResetTotals}

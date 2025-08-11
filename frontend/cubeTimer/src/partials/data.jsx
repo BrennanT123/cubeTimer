@@ -19,6 +19,7 @@ function Data() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [recentSolves, setRecentSolves] = useState([]);
+  const [sanitizedSolves, setSanitizedSolves] = useState([]);
 
   let [isOpen, setIsOpen] = useState(false);
 
@@ -45,6 +46,8 @@ function Data() {
         params: { numSolves: "all" },
         withCredentials: true,
       });
+      sanitizeSolves(res.data.recentSolves);
+      // console.log(res.data.recentSolves);
       setRecentSolves(res.data.recentSolves || []);
     } catch (err) {
       console.log(err);
@@ -54,16 +57,31 @@ function Data() {
     }
   }
 
+  function sanitizeSolves(solves) {
+    const sanitized = (solves || [])
+      .filter((solve) => !solve.dnf)
+      .map((solve) => ({
+        ...solve,
+        time: solve.time + (solve.plusTwo ? 2 : 0),
+      }));
+    setSanitizedSolves(sanitized);
+    // console.log(sanitized);
+    return sanitized;
+  }
+
   async function handlePlusTwoClick(id) {
     try {
-      console.log(recentSolves);
+      // console.log(recentSolves);
       await axios.put(`${API_LINK}/dataRouter/putPlusTwo/${id}`, null, {
         withCredentials: true,
       });
-      setRecentSolves((prev) =>
-        prev.map((s) => (s.id === id ? { ...s, plusTwo: !s.plusTwo } : s))
+
+      const newSolves = recentSolves.map((s) =>
+        s.id === id ? { ...s, plusTwo: !s.plusTwo } : s
       );
-    } catch(err) {
+      setRecentSolves(newSolves);
+      sanitizeSolves(newSolves);
+    } catch (err) {
       console.log(err);
       setError(true);
     }
@@ -74,10 +92,12 @@ function Data() {
       await axios.put(`${API_LINK}/dataRouter/putDnf/${id}`, null, {
         withCredentials: true,
       });
-      setRecentSolves((prev) =>
-        prev.map((s) => (s.id === id ? { ...s, dnf: !s.dnf } : s))
+      const newSolves = recentSolves.map((s) =>
+        s.id === id ? { ...s, dnf: !s.dnf } : s
       );
-    } catch(err) {
+      setRecentSolves(newSolves);
+      sanitizeSolves(newSolves);
+    } catch (err) {
       console.error(err);
       setError(true);
     }
@@ -88,7 +108,9 @@ function Data() {
       await axios.delete(`${API_LINK}/dataRouter/deleteTime/${id}`, {
         withCredentials: true,
       });
-      setRecentSolves((prev) => prev.filter((s) => s.id !== id));
+      const newSolves = recentSolves.filter((s) => s.id !== id);
+      setRecentSolves(newSolves);
+      sanitizeSolves(newSolves);
     } catch {
       setError(true);
     }
@@ -109,6 +131,7 @@ function Data() {
   }
   useEffect(() => {
     getSolvesForTable();
+
     setPage(1);
   }, [newSolve, sessionReady]);
 
@@ -208,10 +231,13 @@ function Data() {
           <Col lg={5} className={dataStyles.rightPane}>
             <div className={dataStyles.chartSide}>
               <div className={dataStyles.card}>
-                <Totals solves={recentSolves} />
+                <Totals
+                  solves={recentSolves}
+                  sanitizedSolves={sanitizedSolves}
+                />
               </div>
               <div className={dataStyles.card}>
-                <SolveChart solves={recentSolves} />
+                <SolveChart solves={sanitizedSolves} />
               </div>
             </div>
             <div
